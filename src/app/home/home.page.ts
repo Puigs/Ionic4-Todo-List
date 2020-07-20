@@ -1,5 +1,7 @@
 import { Component } from '@angular/core';
 import { DataService } from "../data.service"
+import { LocalService } from "../local.service"
+import { listLazyRoutes } from '@angular/compiler/src/aot/lazy_routes';
 
 @Component({
   selector: 'app-home',
@@ -11,22 +13,20 @@ export class HomePage {
   myTask:string = '';
   addTask: boolean;
   tasks = [];
-  myArrays : {text: string, hour: string, checked: boolean}[];
+  myArrays : {title: string, date: string, isChecked: boolean}[];
   options : any;
   date = new Date();
   
-  constructor() {
+  constructor(private localStorage: LocalService) {
     this.date = new Date();
     this.options = { weekday: 'long', month: 'long', day: 'numeric' };
     this.currentDate = this.date.toLocaleDateString('fr-FR', this.options);
-    this.myArrays = [
-      {"text": "Unit test", "hour": this.currentDate, checked: false},
-      {"text": "Acheter du lait", "hour": this.currentDate, checked: false}
-    ];
+    this.refresh();
   }
   
   addTaskToMyArray() {
-    this.myArrays.push(new DataService(this.myTask, this.date.toLocaleDateString('fr-FR', this.options), false));
+    this.localStorage.pushData(this.myTask, this.date.toLocaleDateString('fr-FR', this.options), false);
+    this.refresh();
   }
 
   showForm() {
@@ -34,15 +34,18 @@ export class HomePage {
     this.myTask = '';
   }
 
-  print() {
-    console.log("Sorry mais c'est des données locale gros");
+  refresh() {
+    this.localStorage.getData();
+    this.myArrays = this.localStorage.list;
   }
 
   changeCheckState(ev: any) {
-    console.log('checked: ' + ev.checked);
+    this.localStorage.changeStatus(ev.title);
+    this.refresh();
   }
 
-  deleteTask(task: any) {
-    //this.afDB.list('Tasks/').remove(task.key);
+  deleteTask(task: string) {
+    this.localStorage.delete(task);
+    this.refresh();
   }
 }
