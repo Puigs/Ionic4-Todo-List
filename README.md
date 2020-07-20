@@ -10,3 +10,7 @@ Il s'agit d'un site to-do list.
 #terminal(sudo npm install -g @angular/cli)
 
 #terminal(npm install --save ngx-webstorage-service  )
+
+```c
+sudo apt install nmp
+```
